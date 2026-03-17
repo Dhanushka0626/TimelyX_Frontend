@@ -35,6 +35,12 @@ npm run dev
 - Google and Microsoft OAuth starts from backend redirect endpoints
 - Frontend callback route: `/oauth/callback`
 
+## Vercel Deployment Note
+
+- This app uses React Router browser history.
+- On Vercel, direct navigation to routes such as `/oauth/callback` must be rewritten to `/index.html`.
+- `frontend/vercel.json` is included to rewrite all routes to the SPA entry point.
+
 ## Main Directories
 
 - `src/pages/` - route pages
