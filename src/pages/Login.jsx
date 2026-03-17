@@ -18,13 +18,14 @@ const Login = () => {
 
   const oauthError = searchParams.get("oauthError");
   const API_BASE = (import.meta.env.VITE_API_BASE_URL || "https://timelyx-backend-1.onrender.com").replace(/\/+$/, "");
+  const FRONTEND_ORIGIN = window.location.origin;
 
   const handleGoogleLogin = () => {
-    window.location.href = `${API_BASE}/users/oauth/google`;
+    window.location.href = `${API_BASE}/users/oauth/google?frontend=${encodeURIComponent(FRONTEND_ORIGIN)}`;
   };
 
   const handleMicrosoftLogin = () => {
-    window.location.href = `${API_BASE}/users/oauth/microsoft`;
+    window.location.href = `${API_BASE}/users/oauth/microsoft?frontend=${encodeURIComponent(FRONTEND_ORIGIN)}`;
   };
 
   // Auto redirect if already logged in
