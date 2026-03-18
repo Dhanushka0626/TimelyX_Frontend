@@ -9,19 +9,14 @@ export const AuthProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("user")) || null
   );
 
-  // ensure we have the full profile (including id) when a token exists
+  // Always verify the session against the backend on every page load.
+  // This catches cases where the user account has been deleted (e.g. rejected
+  // by TO) while the frontend still holds a stale token in localStorage.
   useEffect(() => {
     const ensureProfile = async () => {
       const token = localStorage.getItem('token');
       if (!token) return;
       const stored = JSON.parse(localStorage.getItem('user')) || user;
-      const storedId = stored?.id || stored?._id;
-      const hasRealId = Boolean(storedId && storedId !== 'temp' && storedId !== 'undefined' && storedId !== 'null');
-      if (stored && hasRealId) {
-        // already have a valid id
-        setUser(stored);
-        return;
-      }
       try {
         const res = await API.get('/users/me');
         const profile = res.data;
@@ -36,10 +31,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(merged));
         setUser(merged);
       } catch (e) {
-        // failed to fetch profile; clear stored user to avoid inconsistent state
-        console.error('Failed to fetch user profile during init', e);
+        // Account no longer exists or token is invalid — force a clean logout
+        // so the user is redirected to the login page.
+        console.error('Session verification failed — logging out:', e?.response?.data?.message || e.message);
         localStorage.removeItem('user');
-        // keep token so other flows can handle re-auth if needed
+        localStorage.removeItem('token');
         setUser(null);
       }
     };

@@ -20,7 +20,7 @@ npm run dev
 
 ## Environment Variables
 
-- `VITE_API_BASE_URL` (default: `http://localhost:3000`)
+- `VITE_API_BASE_URL` (default: `https://timelyx-backend-1.onrender.com`)
 
 ## Available Scripts
 
@@ -34,6 +34,12 @@ npm run dev
 - Local login/signup via `/users/login` and `/users`
 - Google and Microsoft OAuth starts from backend redirect endpoints
 - Frontend callback route: `/oauth/callback`
+
+## Vercel Deployment Note
+
+- This app uses React Router browser history.
+- On Vercel, direct navigation to routes such as `/oauth/callback` must be rewritten to `/index.html`.
+- `frontend/vercel.json` is included to rewrite all routes to the SPA entry point.
 
 ## Main Directories
 

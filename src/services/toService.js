@@ -22,8 +22,8 @@ const toService = {
     return res.data;
   },
 
-  rejectUser: async (id) => {
-    const res = await API.put(`/to/reject/${id}`);
+  rejectUser: async (id, rejectionReason) => {
+    const res = await API.put(`/to/reject/${id}`, { rejectionReason });
     return res.data;
   },
 

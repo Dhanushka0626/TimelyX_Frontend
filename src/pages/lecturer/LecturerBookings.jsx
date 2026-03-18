@@ -195,6 +195,17 @@ const LecturerBookings = () => {
                   </div>
 
                 </div>
+
+                {booking.status === "Rejected" && booking.rejectionReason && (
+                  <div className="mt-6 rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50 dark:bg-red-950/20 px-4 py-3">
+                    <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                      Rejection Reason
+                    </p>
+                    <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                      {booking.rejectionReason}
+                    </p>
+                  </div>
+                )}
               </div>
             ))
           )}

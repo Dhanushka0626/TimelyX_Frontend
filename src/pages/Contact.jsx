@@ -29,7 +29,7 @@ const Contact = () => {
 
     setLoading(true);
     try {
-      await API.post("/contact/send-message", formData);
+      await API.post("/contact/send-message", formData, { skipAuth: true });
       toast.success("Message sent successfully! We'll get back to you soon.");
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {

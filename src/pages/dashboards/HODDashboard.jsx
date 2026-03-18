@@ -6,15 +6,20 @@ import {
   XCircle,
   TrendingUp,
   Calendar,
+  MessageSquare,
 } from "lucide-react";
 
 import hodService from "../../services/hodService";
+import { useToast } from "../../hooks/useToast";
 
 const HODDashboard = () => {
 
   const [summary, setSummary] = useState({ pending: 0, approvedToday: 0, rejected: 0, totalMonth: 0 });
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [rejectingRequestId, setRejectingRequestId] = useState(null);
+  const [rejectionReasons, setRejectionReasons] = useState({});
+  const toast = useToast();
 
   useEffect(() => {
     loadData();
@@ -39,18 +44,30 @@ const HODDashboard = () => {
   const handleApprove = async (requestId) => {
     try {
       await hodService.updateRequestStatus(requestId, "APPROVED");
+      toast.success("Booking request approved.");
       loadData();
     } catch (err) {
       console.error("Approve failed", err);
+      toast.error(err?.response?.data?.message || "Failed to approve request.");
     }
   };
 
   const handleReject = async (requestId) => {
+    const reason = (rejectionReasons[requestId] || "").trim();
+    if (!reason) {
+      toast.warning("Please enter a rejection reason before submitting.");
+      return;
+    }
+
     try {
-      await hodService.updateRequestStatus(requestId, "REJECTED");
+      await hodService.updateRequestStatus(requestId, "REJECTED", reason);
+      toast.success("Booking request rejected with reason.");
+      setRejectingRequestId(null);
+      setRejectionReasons((prev) => ({ ...prev, [requestId]: "" }));
       loadData();
     } catch (err) {
       console.error("Reject failed", err);
+      toast.error(err?.response?.data?.message || "Failed to reject request.");
     }
   };
 
@@ -260,14 +277,51 @@ const HODDashboard = () => {
                 </button>
 
                 <button
-                  onClick={() => handleReject(req.requestId || req._id || req.id)}
+                  onClick={() => {
+                    const id = req.requestId || req._id || req.id;
+                    setRejectingRequestId((prev) => (prev === id ? null : id));
+                  }}
                   className="flex-1 bg-red-600 text-white py-3 rounded-xl font-medium hover:bg-red-700 transition flex items-center justify-center gap-2"
                 >
                   <XCircle size={18} />
-                  Reject
+                  Add Reason & Reject
                 </button>
 
               </div>
+
+              {rejectingRequestId === (req.requestId || req._id || req.id) && (
+                <div className="mt-4 p-4 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50/70 dark:bg-red-950/20 space-y-3">
+                  <label className="text-sm font-medium text-red-900 dark:text-red-200 flex items-center gap-2">
+                    <MessageSquare size={16} />
+                    Rejection reason (required)
+                  </label>
+                  <textarea
+                    value={rejectionReasons[req.requestId || req._id || req.id] || ""}
+                    onChange={(e) => {
+                      const id = req.requestId || req._id || req.id;
+                      setRejectionReasons((prev) => ({ ...prev, [id]: e.target.value }));
+                    }}
+                    rows={3}
+                    maxLength={300}
+                    placeholder="Explain clearly why this request was rejected..."
+                    className="w-full rounded-lg border border-red-200 dark:border-red-900/50 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleReject(req.requestId || req._id || req.id)}
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition"
+                    >
+                      Confirm Reject
+                    </button>
+                    <button
+                      onClick={() => setRejectingRequestId(null)}
+                      className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
 
             </div>
           ))}

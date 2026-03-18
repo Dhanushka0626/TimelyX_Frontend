@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle, Users } from "lucide-react";
+import { CheckCircle2, XCircle, Users, MessageSquare } from "lucide-react";
 import { useEffect, useState } from "react";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import toService from "../../services/toService";
@@ -9,6 +9,9 @@ const TOPendingUsers = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const [rejectingUserId, setRejectingUserId] = useState(null);
+  const [rejectionReasons, setRejectionReasons] = useState({});
 
   const [editingUser, setEditingUser] = useState(null);
   const [form, setForm] = useState({
@@ -140,12 +143,19 @@ const TOPendingUsers = () => {
   };
 
   const handleReject = async (id) => {
+    const reason = (rejectionReasons[id] || '').trim();
+    if (!reason) {
+      setError('Please enter a rejection reason before submitting.');
+      return;
+    }
     try {
       setActionLoading(true);
       setError('');
       setSuccess('');
-      await toService.rejectUser(id);
+      await toService.rejectUser(id, reason);
       setSuccess('User rejected successfully.');
+      setRejectingUserId(null);
+      setRejectionReasons((prev) => ({ ...prev, [id]: '' }));
       await loadUsers();
       window.dispatchEvent(new Event('toDashboardChange'));
     } catch (err) {
@@ -278,15 +288,49 @@ const TOPendingUsers = () => {
                   </button>
 
                   <button
-                    onClick={() => handleReject(user.id)}
+                    onClick={() => setRejectingUserId((prev) => (prev === user.id ? null : user.id))}
                     disabled={actionLoading}
                     className="flex-1 bg-red-600 text-white py-3 rounded-xl font-medium hover:bg-red-700 transition flex items-center justify-center gap-2"
                   >
                     <XCircle size={18} />
-                    Reject
+                    Add Reason & Reject
                   </button>
 
                 </div>
+
+                {rejectingUserId === user.id && (
+                  <div className="mt-4 p-4 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50/70 dark:bg-red-950/20 space-y-3">
+                    <label className="text-sm font-medium text-red-900 dark:text-red-200 flex items-center gap-2">
+                      <MessageSquare size={16} />
+                      Rejection reason (required)
+                    </label>
+                    <textarea
+                      value={rejectionReasons[user.id] || ''}
+                      onChange={(e) =>
+                        setRejectionReasons((prev) => ({ ...prev, [user.id]: e.target.value }))
+                      }
+                      rows={3}
+                      maxLength={300}
+                      placeholder="Explain clearly why this registration is being rejected..."
+                      className="w-full rounded-lg border border-red-200 dark:border-red-900/50 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleReject(user.id)}
+                        disabled={actionLoading}
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition"
+                      >
+                        Confirm Reject
+                      </button>
+                      <button
+                        onClick={() => setRejectingUserId(null)}
+                        className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
 
               </div>
             ))

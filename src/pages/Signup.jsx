@@ -9,14 +9,15 @@ const Signup = () => {
   const { signup } = useContext(AuthContext);
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', username: '', password: '', confirm: '' });
   const [error, setError] = useState('');
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+  const API_BASE = (import.meta.env.VITE_API_BASE_URL || "https://timelyx-backend-1.onrender.com").replace(/\/+$/, "");
+  const FRONTEND_ORIGIN = window.location.origin;
 
   const handleGoogleSignup = () => {
-    window.location.href = `${API_BASE}/users/oauth/google`;
+    window.location.href = `${API_BASE}/users/oauth/google?frontend=${encodeURIComponent(FRONTEND_ORIGIN)}`;
   };
 
   const handleMicrosoftSignup = () => {
-    window.location.href = `${API_BASE}/users/oauth/microsoft`;
+    window.location.href = `${API_BASE}/users/oauth/microsoft?frontend=${encodeURIComponent(FRONTEND_ORIGIN)}`;
   };
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
