@@ -6,7 +6,7 @@ import toService from "../../services/toService";
 const TOHistory = () => {
   const [history, setHistory] = useState([]);
   const [filtered, setFiltered] = useState([]);
-  const [stats, setStats] = useState({ approved: 0, total: 0 });
+  const [stats, setStats] = useState({ approved: 0, rejected: 0, total: 0 });
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -27,9 +27,10 @@ const TOHistory = () => {
       setHistory(data || []);
       setFiltered(data || []);
       
-      // Calculate stats — rejected users are removed from the system on rejection
+      // Calculate stats
       const approved = data.filter(item => item.status === 'approved').length;
-      setStats({ approved, total: data.length });
+      const rejected = data.filter(item => item.status === 'rejected').length;
+      setStats({ approved, rejected, total: data.length });
     } catch (error) {
       console.error("Failed to fetch history:", error);
     } finally {
@@ -96,7 +97,7 @@ const TOHistory = () => {
           <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm p-6 transition-colors">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-slate-400 font-medium">Total Approved</p>
+                <p className="text-sm text-gray-600 dark:text-slate-400 font-medium">Total Decisions</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-slate-100 mt-1">{stats.total}</p>
               </div>
               <div className="bg-blue-100 rounded-full p-3">
@@ -108,11 +109,23 @@ const TOHistory = () => {
           <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm p-6 transition-colors">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-slate-400 font-medium">Active Users</p>
+                <p className="text-sm text-gray-600 dark:text-slate-400 font-medium">Approved</p>
                 <p className="text-3xl font-bold text-green-600 mt-1">{stats.approved}</p>
               </div>
               <div className="bg-green-100 rounded-full p-3">
                 <UserCheck className="text-green-600" size={24} />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm p-6 transition-colors">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-slate-400 font-medium">Rejected</p>
+                <p className="text-3xl font-bold text-red-600 mt-1">{stats.rejected}</p>
+              </div>
+              <div className="bg-red-100 rounded-full p-3">
+                <UserX className="text-red-600" size={24} />
               </div>
             </div>
           </div>
@@ -148,14 +161,15 @@ const TOHistory = () => {
               />
             </div>
 
-            {/* STATUS FILTER — only approved users are kept; rejected registrations are deleted */}
+            {/* STATUS FILTER */}
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
             >
-              <option value="all">All</option>
+              <option value="all">All Status</option>
               <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
             </select>
 
             {/* ROLE FILTER */}
@@ -169,6 +183,7 @@ const TOHistory = () => {
               <option value="LECTURER">Lecturer</option>
               <option value="HOD">HOD</option>
               <option value="TO">TO</option>
+              <option value="REJECTED">Rejected</option>
             </select>
 
             {/* FROM DATE */}
@@ -300,13 +315,6 @@ const TOHistory = () => {
                           <Calendar size={14} />
                           <span>Decision date: {item.date}</span>
                         </div>
-
-                        {item.status === 'rejected' && item.rejectionReason && (
-                          <div className="mt-2 rounded-lg border border-red-200 dark:border-red-900/40 bg-red-50 dark:bg-red-950/20 px-3 py-2">
-                            <p className="text-xs font-medium text-red-800 dark:text-red-200">Rejection Reason</p>
-                            <p className="text-sm text-red-700 dark:text-red-300 mt-0.5">{item.rejectionReason}</p>
-                          </div>
-                        )}
                       </div>
                     </div>
 

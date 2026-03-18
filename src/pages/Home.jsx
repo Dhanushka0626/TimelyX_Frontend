@@ -1,5 +1,5 @@
 import heroImage from "../assets/lecture-hall.jpg";
-import logo from "../assets/logo.png";
+import descriptionImage from "../assets/lecture-hall-view.jpg";
 
 const Home = () => {
   return (
@@ -19,11 +19,11 @@ const Home = () => {
             across departments.
           </p>
 
-          <div className="mx-auto w-full max-w-4xl rounded-xl sm:rounded-2xl overflow-hidden shadow-lg sm:shadow-2xl ring-1 ring-slate-200/80 dark:ring-slate-700/80 bg-slate-200 dark:bg-slate-700">
+          <div className="rounded-xl sm:rounded-2xl overflow-hidden shadow-xl">
             <img
               src={heroImage}
               alt="Lecture Hall"
-              className="w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[16/9] object-cover object-center"
+              className="w-full object-cover"
             />
           </div>
 
@@ -48,11 +48,11 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="order-first md:order-last flex items-center justify-center">
+          <div className="rounded-xl sm:rounded-2xl overflow-hidden shadow-lg order-first md:order-last">
             <img
-              src={logo}
-              alt="Timelyx Logo"
-              className="w-full max-w-[170px] sm:max-w-[210px] md:max-w-[240px] lg:max-w-[280px] h-auto object-contain"
+              src={descriptionImage}
+              alt="Academic Environment"
+              className="w-full object-cover"
             />
           </div>
 

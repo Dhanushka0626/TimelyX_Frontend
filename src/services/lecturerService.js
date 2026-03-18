@@ -71,8 +71,7 @@ const lecturerService = {
       hall: b.timeSlot && b.timeSlot.hall ? (b.timeSlot.hall.name || b.timeSlot.hall) : null,
       date: b.timeSlot ? b.timeSlot.date : null,
       time: b.timeSlot ? b.timeSlot.startTime : null,
-      status: normalizeStatus(b.status),
-      rejectionReason: b.rejectionReason || ""
+      status: normalizeStatus(b.status)
     }));
   },
 

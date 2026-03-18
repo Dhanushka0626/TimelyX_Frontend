@@ -13,7 +13,6 @@ const mapBookingToHistoryItem = (b) => {
     students: b.targetBatch ? `Batch: ${b.targetBatch}` : (b.students || b.studentCount || "-"),
     decisionDate: b.updatedAt || b.decisionDate || null,
     status: (b.status || "").toString().toLowerCase(),
-    rejectionReason: b.rejectionReason || "",
   };
 };
 
@@ -35,12 +34,8 @@ const hodService = {
     return raw.map(mapBookingToHistoryItem);
   },
 
-  updateRequestStatus: async (id, status, rejectionReason = "") => {
-    const body = { status };
-    if (status === "REJECTED") {
-      body.rejectionReason = rejectionReason;
-    }
-    const res = await API.put(`/hod/request/${id}`, body);
+  updateRequestStatus: async (id, status) => {
+    const res = await API.put(`/hod/request/${id}`, { status });
     return res.data;
   },
 
