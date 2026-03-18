@@ -5,5 +5,6 @@
     "VITE_API_BASE_URL": "@VITE_API_BASE_URL",
     "VITE_GOOGLE_CLIENT_ID": "@VITE_GOOGLE_CLIENT_ID"
   },
-  "framework": "vite"
+  "framework": "vite",
+  "nodeVersion": "18"
 }
